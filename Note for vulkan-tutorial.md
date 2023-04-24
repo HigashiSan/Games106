@@ -69,4 +69,11 @@ ps：
 3、使用vkGetDeviceQueue函数获取命令队列句柄    
 4、使用vkCreateDevice创建逻辑设备
 
+找到physicalDevice支持的队列：
+
+![image](https://user-images.githubusercontent.com/56297955/234130776-c3abe6a5-0834-44c8-9654-6d6bd99dbc4c.png)
+
+![image](https://user-images.githubusercontent.com/56297955/234130830-d67ec181-feb0-4149-8175-5e8c258fb84f.png)
+
+
 
