@@ -27,3 +27,8 @@ instance是Vulkan application和Vulkan library之间的一个connection，用来
 
 ![image](https://user-images.githubusercontent.com/56297955/234096619-fa29a175-bd13-482c-98f6-8cc5eb438373.png)
 
+检测所有可用的物理设备，然后保存在vector里面，然后依次检测可用性，把可用的那一个保存在刚刚定义的physicalDevice里面。
+
+![image](https://user-images.githubusercontent.com/56297955/234101437-5c13e9d6-d5ff-42ef-8871-31d447dbb27d.png)
+
+
