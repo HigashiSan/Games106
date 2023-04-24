@@ -21,4 +21,9 @@ instance是Vulkan application和Vulkan library之间的一个connection，用来
 
 ### 物理设备和队列族 Physical devices and queue families
 
+物理设备，主要指显卡，在使用Vulkan API时，需要首先枚举和选择可用的物理设备，并查询其支持的Vulkan功能和属性。
+
+定义物理设备，用来储存后面我们找出来的符合条件的物理设备：
+
+![image](https://user-images.githubusercontent.com/56297955/234096619-fa29a175-bd13-482c-98f6-8cc5eb438373.png)
 
