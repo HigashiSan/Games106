@@ -37,6 +37,12 @@ instance是Vulkan application和Vulkan library之间的一个connection，用来
 
 在具体使用时，我们对于当前的一个物理设备physicalDevice，使用vkGetPhysicalDeviceQueueFamilyProperties这个API去查询它支持的队列簇，并且保存队列簇的个数。然后保存在VkQueueFamilyProperties类型的vector里，然后遍历这个vector依次查询我们想要的队列簇。
 
+![image](https://user-images.githubusercontent.com/56297955/234112795-65ba4f90-5201-4e9a-bab9-16606c9003c8.png)
+
+使用标志位去判断是否支持我们想要的队列，是的话就保存起来，这个物理设备就可用。
+
+![image](https://user-images.githubusercontent.com/56297955/234113278-26bb0730-577e-447c-8704-941bd1e262ed.png)
+
 
 
 
