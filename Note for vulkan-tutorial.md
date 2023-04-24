@@ -31,4 +31,12 @@ instance是Vulkan application和Vulkan library之间的一个connection，用来
 
 ![image](https://user-images.githubusercontent.com/56297955/234101437-5c13e9d6-d5ff-42ef-8871-31d447dbb27d.png)
 
+关于vulkan的队列簇，vulkan的操作都是提交到队列中执行的，每个队列都属于不同的队列簇，不同的队列簇支持不同的操作，比如数值计算的队列，图形指令的队列。
+
+每个队列族都有一个队列族索引（Queue Family Index），用于在创建逻辑设备时指定所需的队列类型。例如，可以定义一个支持图形操作的队列族，一个支持计算操作的队列族，一个支持传输操作的队列族等等。通常情况下，Vulkan应用程序需要至少一个支持图形操作的队列和一个支持传输操作的队列。对这些队列的识别，就是定义一个uint32_t的索引。QueueFamilyIndices就是储存这些索引的一个结构，它是我们自己定义的，名称可变，如果你只要求图形操作，那也可以不定义结构，直接简单地使用一个uint32_t类型去存就行了。
+
+在具体使用时，我们对于当前的一个物理设备physicalDevice，使用vkGetPhysicalDeviceQueueFamilyProperties这个API去查询它支持的队列簇，并且保存队列簇的个数。然后保存在VkQueueFamilyProperties类型的vector里，然后遍历这个vector依次查询我们想要的队列簇。
+
+
+
 
