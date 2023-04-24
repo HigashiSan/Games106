@@ -75,5 +75,20 @@ ps：
 
 ![image](https://user-images.githubusercontent.com/56297955/234130830-d67ec181-feb0-4149-8175-5e8c258fb84f.png)
 
+填写VkDeviceCreateInfo结构体中的VkDeviceQueueCreateInfo，通过它来指定要使用的队列：
+
+![image](https://user-images.githubusercontent.com/56297955/234134473-4a59cde0-31fc-4d5a-b6ed-6d466f0f16d2.png)
+
+创建设备特性：
+
+![image](https://user-images.githubusercontent.com/56297955/234134649-11b1b94a-dc1e-46fb-ad42-1ade84dae404.png)
+
+这两个结构写好之后，就来填VkDeviceCreateInfo了，将VkDeviceCreateInfo结构体的pQueueCreateInfos指针指向queueCreateInfo的地址，pEnabledFeatures指针指向deviceFeatures的地址：
+
+![image](https://user-images.githubusercontent.com/56297955/234135267-016ad8b1-e1f4-4fa0-87a3-78ea7444de72.png)
+
+
+
+
 
 
