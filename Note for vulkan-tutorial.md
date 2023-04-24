@@ -64,7 +64,9 @@ ps：
 
 **创建逻辑设备的流程**
 
-1、在可用的物理设备选择要使用的物理设备 physicalDevice
-2、填写VkDeviceCreateInfo 结构体，它包含了创建逻辑设备所需的命令队列类型、扩展和特性等信息
-3、使用vkGetDeviceQueue函数获取命令队列句柄
+1、在可用的物理设备选择要使用的物理设备 physicalDevice  
+2、填写VkDeviceCreateInfo 结构体，它包含了创建逻辑设备所需的命令队列类型、扩展和特性等信息  
+3、使用vkGetDeviceQueue函数获取命令队列句柄    
+4、使用vkCreateDevice创建逻辑设备
+
 
