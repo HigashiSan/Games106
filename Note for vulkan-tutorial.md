@@ -99,15 +99,29 @@ PS：
 
 ![image](https://user-images.githubusercontent.com/56297955/234140462-245b1de2-a247-4921-b1b4-bbf7173b29a8.png)![image](https://user-images.githubusercontent.com/56297955/234140800-6e7147c7-878d-48e1-89f3-17f8552f51f6.png)
 
+创建好逻辑设备之后，一般还要
+
 **到目前为止，总结一下Vulkan的初始化思路：**
 
 ![image](https://user-images.githubusercontent.com/56297955/234165789-ea10189d-41ee-4c60-9717-82f67400c1d6.png)
 
 ### 窗口表面&交换链 Window surface & Swapchain
 
-Window Surface 是一个用于将 Vulkan 渲染结果显示在窗口系统中的对象。因为Vulkan是跨平台的，他不能和窗口系统交互，而Window Surface就提供了窗口系统所需的信息，使 Vulkan 能够将渲染结果显示在正确的窗口中。可以用VK_KHR_surface扩展实现。（Khronos为了实现跨平台的目标，为不同平台创造了一个统一的抽象层，名为surface，它是将Vulkan和具体设备显示连接起来的一个桥梁）
+Window Surface 是一个用于将 Vulkan 渲染结果显示在窗口系统中的对象。因为Vulkan是跨平台的，他不能和窗口系统交互，而Window Surface就提供了窗口系统所需的信息，使 Vulkan 能够将渲染结果显示在正确的窗口中。可以用VK_KHR_surface扩展实现。（Khronos为了实现跨平台的目标，为不同平台创造了一个统一的抽象层，名为surface，它是将Vulkan和具体设备显示连接起来的一个桥梁），创建成功后，可以在 Vulkan 中使用 Window Surface层来创建 Swapchain（交换链）。Vulkan不存在默认的帧缓冲的概念，它需要一个能够缓冲渲染操作的组件。交换链本质上是一个包含了若干等待呈现的图像的队列。应用程序从交换链获取一张图像，在图像上进行渲染操作，完成后将图像返回到交换链队列。交换链也被用来同步图像呈现和屏幕刷新。
 
-创建成功后，可以在 Vulkan 中使用 Window Surface层来创建 Swapchain（交换链）。Vulkan不存在默认的帧缓冲的概念，它需要一个能够缓冲渲染操作的组件。交换链本质上是一个包含了若干等待呈现的图像的队列。应用程序从交换链获取一张图像，在图像上进行渲染操作，完成后将图像返回到交换链队列。交换链也被用来同步图像呈现和屏幕刷新。
+首先，我们要再定义一个presentFamily，因为我们需要查找支持图像呈现的队列族的索引：
+
+![image](https://user-images.githubusercontent.com/56297955/234267803-4c31aa2a-882f-4885-ba83-dff58879e6d7.png)
+
+然后使用vkGetPhysicalDeviceSurfaceSupportKHR函数来检查物理设备是否具有图像表现能力，这个在检查是否支持图形指令的地方一起检查就行：
+
+![image](https://user-images.githubusercontent.com/56297955/234296753-b85d3d27-f6db-411a-90fb-9031a6386044.png)
+
+![image](https://user-images.githubusercontent.com/56297955/234298754-f64b3d95-72ca-4faf-a8ba-5271903f3047.png)
+
+
+
+
 
 
 
