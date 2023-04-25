@@ -31,15 +31,23 @@ instance是Vulkan application和Vulkan library之间的一个connection，用来
 
 ![image](https://user-images.githubusercontent.com/56297955/234101437-5c13e9d6-d5ff-42ef-8871-31d447dbb27d.png)
 
-关于vulkan的队列簇，vulkan的操作都是提交到队列中执行的，每个队列都属于不同的队列簇，不同的队列簇支持不同的操作，比如数值计算的队列，图形指令的队列。
+关于vulkan的队列簇，vulkan的操作都是提交到队列中执行的，每个队列簇都包含多个队列，不同的队列支持不同的操作，比如数值计算的队列，图形指令的队列。一个队列簇可以支持多个类型的队列，然后每个类型的队列的个数也可能有多个。比如某个GPU的某一个图形簇，支持图形指令，也支持计算指令，然后支持图形指令的队列有五个，支持计算指令的队列有四个。通常情况下，Vulkan应用程序需要至少一个支持图形操作的队列和一个支持传输操作的队列。这些相同类型的队列可以并行执行，但它们之间可能会存在一些竞争和同步关系，例如，如果多个队列同时访问同一块内存区域，就可能会发生竞争和数据不一致等问题。在使用多个队列时，需要仔细考虑同步和竞争关系，以确保应用程序的正确性和性能。有多少队列簇，每个队列簇包含多少队列，这些就是硬件的特性，不同的GPU硬件设备会有不同的队列簇架构。
 
-每个队列族都有一个队列族索引（Queue Family Index），用于在创建逻辑设备时指定所需的队列类型。例如，可以定义一个支持图形操作的队列族，一个支持计算操作的队列族，一个支持传输操作的队列族等等。通常情况下，Vulkan应用程序需要至少一个支持图形操作的队列和一个支持传输操作的队列。对这些队列的识别，就是定义一个uint32_t的索引。QueueFamilyIndices就是储存这些索引的一个结构，它是我们自己定义的，名称可变，如果你只要求图形操作，那也可以不定义结构，直接简单地使用一个uint32_t类型去存就行了。
+在具体使用时，我们对于当前的一个物理设备physicalDevice，使用vkGetPhysicalDeviceQueueFamilyProperties这个API去查询它支持的队列簇，vkGetPhysicalDeviceQueueFamilyProperties的第一个参数就是当前查询的物理设备，第二个参数是支持的队列簇个数，第三个参数是物理设备上支持的所有队列簇的属性信息。
 
-在具体使用时，我们对于当前的一个物理设备physicalDevice，使用vkGetPhysicalDeviceQueueFamilyProperties这个API去查询它支持的队列簇，并且保存队列簇的个数。然后保存在VkQueueFamilyProperties类型的vector里，然后遍历这个vector依次查询我们想要的队列簇。
+![image](https://user-images.githubusercontent.com/56297955/234163314-db2fb147-7701-4ea8-9e52-1c848f654319.png)
+
+先查队列簇的个数，不写入VkQueueFamilyProperties，然后分配好一块儿这么大的数组，再调用这个函数，这次再把队列簇的信息写入我们定义好的VkQueueFamilyProperties类型的数组里。
 
 ![image](https://user-images.githubusercontent.com/56297955/234112795-65ba4f90-5201-4e9a-bab9-16606c9003c8.png)
 
-使用标志位去判断是否支持我们想要的队列，是的话就保存起来，这个物理设备就可用。
+最后，就可以依次遍历这个数组中的所有队列簇，每个队列簇的信息都由VkQueueFamilyProperties来保存
+
+![image](https://user-images.githubusercontent.com/56297955/234164478-bb6edda9-f3e7-4300-9b10-518709a7ecc0.png)
+
+然后就可以用queueFlags去判断这个队列簇支持哪些队列，它是一个掩码，所以可以与其他掩码做与运算判断支持哪个队列，下面是一些常见的掩码：
+
+![image](https://user-images.githubusercontent.com/56297955/234165049-53ea6201-0e21-4ecd-9434-602ec6f8367d.png)
 
 ![image](https://user-images.githubusercontent.com/56297955/234113278-26bb0730-577e-447c-8704-941bd1e262ed.png)
 
@@ -51,7 +59,7 @@ instance是Vulkan application和Vulkan library之间的一个connection，用来
 
 vulkan中设计的物理设备是为了对显卡等硬件（主要是显卡）做一个抽象，用来表示（储存）物理设备的信息（如显卡型号）以及可用的硬件资源（支持的命令队列和硬件可用的特性或拓展）。然后逻辑设备就是在这个的基础上创建的，它是application与hardware之间的接口，可以让应用层通过它去调用硬件资源，而且在创建时可以选择性地包含所需的命令队列和扩展，并指定所需的特性和属性，所以可以认为物理设备提供了一大堆东西，然后逻辑设备可以选择性地使用我们需要的。
 
-ps：
+PS：
 
 硬件扩展（Hardware Extension）是指Vulkan API中提供的额外功能和特性，这些功能和特性可能并不是所有硬件设备都支持。硬件扩展可以提供一些新的、高级的、专用的或实验性的功能，以满足应用程序的需求。硬件扩展是由GPU厂商提供的，它们可以通过Vulkan API进行查询和启用。在使用硬件扩展之前，需要检查当前物理设备是否支持该扩展。如果支持，可以在创建逻辑设备时启用这些扩展。
 
@@ -91,7 +99,13 @@ ps：
 
 ![image](https://user-images.githubusercontent.com/56297955/234140462-245b1de2-a247-4921-b1b4-bbf7173b29a8.png)![image](https://user-images.githubusercontent.com/56297955/234140800-6e7147c7-878d-48e1-89f3-17f8552f51f6.png)
 
+**到目前为止，总结一下Vulkan的初始化思路：**
 
+![image](https://user-images.githubusercontent.com/56297955/234165789-ea10189d-41ee-4c60-9717-82f67400c1d6.png)
+
+### 交换链 Swapchain
+
+交换链（Swapchain）是用于在窗口系统和Vulkan应用程序之间进行图像交换的机制。交换链通常由窗口系统提供，用于在窗口表面上展示渲染结果。它本质上一个包含了若干等待呈现的图像的队列。
 
 
 
