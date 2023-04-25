@@ -152,5 +152,28 @@ ps：
 
 呈现格式、表面格式和交换链中的图像分辨率都设置好了之后，就可以正式的创建交换链。
 
+首先设置好三个基本能力：
+
+![image](https://user-images.githubusercontent.com/56297955/234425464-057d656e-1b24-4de8-a1e4-0556b69f67de.png)
+
+然后设置好交换链支持的图像个数：
+
+![image](https://user-images.githubusercontent.com/56297955/234425620-3795692d-a66a-4d81-8f88-dd780aca9a57.png)
+
+然后就是填写VkSwapchainCreateInfoKHR结构体：
+
+![image](https://user-images.githubusercontent.com/56297955/234431719-d3691186-4dae-4a1b-9550-e3ff6c7355d7.png)
+
+填完之后就是常规套路，使用API去创建交换链：
+
+![image](https://user-images.githubusercontent.com/56297955/234431991-65e23669-0560-4f60-8984-58081bee84c1.png)
+
+![image](https://user-images.githubusercontent.com/56297955/234432364-7de48fab-7dd7-49f4-a70e-a71c2f003954.png)
+
+创建完之后就可以使用vkGetSwapchainImagesKHR去取得交换链缓冲区的图像，同样是先获取数量，然后再分配数组空间，把图像存在vector里：
+
+![image](https://user-images.githubusercontent.com/56297955/234432265-71ec7c15-d8c4-4e0d-9bc8-b4929f952a12.png)
+
+
 
 
