@@ -123,6 +123,11 @@ Window Surface 是一个用于将 Vulkan 渲染结果显示在窗口系统中的
 
 ![image](https://user-images.githubusercontent.com/56297955/234298754-f64b3d95-72ca-4faf-a8ba-5271903f3047.png)
 
+在创建交换链时，同样也要检测设备是否支持交换链，和检查物理设备的时候一样，使用类似的vkEnumerateDeviceExtensionProperties，去枚举所有拓展，然后看是否支持
+
+![image](https://user-images.githubusercontent.com/56297955/234308705-0137bf10-4add-4228-84da-e090cf35768d.png)
+
+![image](https://user-images.githubusercontent.com/56297955/234310737-2dd5982b-b8f8-4bb1-87ff-a4de4b443f64.png)
 
 
 
