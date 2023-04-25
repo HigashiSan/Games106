@@ -139,13 +139,18 @@ ps：
 
 ![image](https://user-images.githubusercontent.com/56297955/234342931-9b4e6a5b-94b3-4313-ae57-d810a8d64671.png)
 
-其中，VkSurfaceCapabilitiesKHR是表面特性，它包含交换链中图像的最小和最大数量，交换链中图像的最小和最大尺寸，交换链中图像支持的像素格式等；VkSurfaceFormatKHR是指像素格式、颜色空间等；VkPresentModeKHR是指交换链在把图像呈现在屏幕上的方式，比如立即模式，渲染出图像不缓存，直接输出到屏幕，另外一种是FIFO，先进先出模式，先保存在交换链缓存里的先渲染到屏幕。
+其中，VkSurfaceCapabilitiesKHR是表面特性，它包含交换链中图像的最小和最大数量，交换链中图像的最小和最大尺寸，交换链中图像支持的像素格式等；VkSurfaceFormatKHR是指像素格式、颜色空间等；VkPresentModeKHR是指交换链在把图像呈现在屏幕上的方式，比如立即模式，渲染出图像不缓存，直接输出到屏幕，另外一种是FIFO，先进先出模式，先保存在交换链缓存里的先渲染到屏幕。这三个就是一个交换链必须要有的能力（特性）。
 
 然后分别使用vkGetPhysicalDeviceSurfaceCapabilitiesKHR、vkGetPhysicalDeviceSurfaceFormatsKHR、vkGetPhysicalDeviceSurfacePresentModesKHR去查询就好了，查询结果保存在结构体里，这个函数的参数是物理设备，查询物理设备的交换链支持：
 
 ![image](https://user-images.githubusercontent.com/56297955/234357623-c341e7a2-0079-46b8-9307-98cbd76cbf17.png)
 
 
-查询完之后依次检测这三个是不是empty就行了。
+查询完之后依次检测formats、presentModes是不是empty就行了。
+
+确定了这三个基本能力、特性之后，就可以进行下一步，为这三个特性选择合适的设置，比如具体选择哪一个呈现模式，选择哪个颜色空间等。具体代码就不贴了，这就是纯粹地用API。
+
+呈现格式、表面格式和交换链中的图像分辨率都设置好了之后，就可以正式的创建交换链。
+
 
 
