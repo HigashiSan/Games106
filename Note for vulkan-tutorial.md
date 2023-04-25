@@ -99,7 +99,9 @@ PS：
 
 ![image](https://user-images.githubusercontent.com/56297955/234140462-245b1de2-a247-4921-b1b4-bbf7173b29a8.png)![image](https://user-images.githubusercontent.com/56297955/234140800-6e7147c7-878d-48e1-89f3-17f8552f51f6.png)
 
-创建好逻辑设备之后，一般还要
+创建好逻辑设备之后，还需要使用vkGetDeviceQueue去取得创建好的设备的队列簇
+![image](https://user-images.githubusercontent.com/56297955/234301885-22625f76-192e-42a6-8577-14a6ab13e95b.png)
+![image](https://user-images.githubusercontent.com/56297955/234301958-8cf2a729-2593-4757-8e5b-a617a847915f.png)
 
 **到目前为止，总结一下Vulkan的初始化思路：**
 
