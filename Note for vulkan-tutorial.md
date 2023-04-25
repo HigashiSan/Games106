@@ -111,7 +111,13 @@ PS：
 
 ### 窗口表面&交换链 Window surface & Swapchain
 
-Window Surface 是一个用于将 Vulkan 渲染结果显示在窗口系统中的对象。因为Vulkan是跨平台的，他不能和窗口系统交互，而Window Surface就提供了窗口系统所需的信息，使 Vulkan 能够将渲染结果显示在正确的窗口中。可以用VK_KHR_surface扩展实现。（Khronos为了实现跨平台的目标，为不同平台创造了一个统一的抽象层，名为surface，它是将Vulkan和具体设备显示连接起来的一个桥梁），创建成功后，可以在 Vulkan 中使用 Window Surface层来创建 Swapchain（交换链）。Vulkan不存在默认的帧缓冲的概念，它需要一个能够缓冲渲染操作的组件。交换链本质上是一个包含了若干等待呈现的图像的队列。应用程序从交换链获取一张图像，在图像上进行渲染操作，完成后将图像返回到交换链队列。交换链也被用来同步图像呈现和屏幕刷新。
+Window Surface 是一个用于将 Vulkan 渲染结果显示在窗口系统中的对象。因为Vulkan是跨平台的，他不能和窗口系统交互，而Window Surface就提供了窗口系统所需的信息，使 Vulkan 能够将渲染结果显示在正确的窗口中。可以用VK_KHR_surface扩展实现。（Khronos为了实现跨平台的目标，为不同平台创造了一个统一的抽象层，名为surface，它是将Vulkan和具体设备显示连接起来的一个桥梁），创建成功后，可以在 Vulkan 中使用 Window Surface层来创建 Swapchain（交换链）。
+
+Vulkan不存在默认的帧缓冲的概念，它需要一个能够缓冲渲染操作的组件。交换链本质上是一个包含了若干等待呈现的图像的队列，应用程序从交换链获取一张图像，在图像上进行渲染操作，完成后将图像返回到交换链队列。所以它本质上就是一个图像缓冲区，每个缓冲区都包含一个完整的图像帧，交换链的缓冲区数量由硬件决定。
+
+ps：
+
+一个物理设备可以有多个交换链，每个交换链进行不同的配置，如专门的缓冲区数量、呈现模式、表面格式等，然后在渲染时使用不同的交换链来优化渲染性能和质量。
 
 首先，我们要再定义一个presentFamily，因为我们需要查找支持图像呈现的队列族的索引：
 
@@ -129,8 +135,17 @@ Window Surface 是一个用于将 Vulkan 渲染结果显示在窗口系统中的
 
 ![image](https://user-images.githubusercontent.com/56297955/234310737-2dd5982b-b8f8-4bb1-87ff-a4de4b443f64.png)
 
+在确定了是否支持之后，就是查询更多的信息，比起创建实例，创建交换链还需要设置更多的细节。Vulkan中会使用SwapChainSupportDetails这个结构体去保存细节信息（自己定义）：
+
+![image](https://user-images.githubusercontent.com/56297955/234342931-9b4e6a5b-94b3-4313-ae57-d810a8d64671.png)
+
+其中，VkSurfaceCapabilitiesKHR是表面特性，它包含交换链中图像的最小和最大数量，交换链中图像的最小和最大尺寸，交换链中图像支持的像素格式等；VkSurfaceFormatKHR是指像素格式、颜色空间等；VkPresentModeKHR是指交换链在把图像呈现在屏幕上的方式，比如立即模式，渲染出图像不缓存，直接输出到屏幕，另外一种是FIFO，先进先出模式，先保存在交换链缓存里的先渲染到屏幕。
+
+然后分别使用vkGetPhysicalDeviceSurfaceCapabilitiesKHR、vkGetPhysicalDeviceSurfaceFormatsKHR、vkGetPhysicalDeviceSurfacePresentModesKHR去查询就好了，查询结果保存在结构体里，这个函数的参数是物理设备，查询物理设备的交换链支持：
+
+![image](https://user-images.githubusercontent.com/56297955/234357623-c341e7a2-0079-46b8-9307-98cbd76cbf17.png)
 
 
-
+查询完之后依次检测这三个是不是empty就行了。
 
 
