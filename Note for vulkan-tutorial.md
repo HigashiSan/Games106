@@ -103,9 +103,11 @@ PS：
 
 ![image](https://user-images.githubusercontent.com/56297955/234165789-ea10189d-41ee-4c60-9717-82f67400c1d6.png)
 
-### 交换链 Swapchain
+### 窗口表面&交换链 Window surface & Swapchain
 
-交换链（Swapchain）是用于在窗口系统和Vulkan应用程序之间进行图像交换的机制。交换链通常由窗口系统提供，用于在窗口表面上展示渲染结果。它本质上一个包含了若干等待呈现的图像的队列。
+Window Surface 是一个用于将 Vulkan 渲染结果显示在窗口系统中的对象。因为Vulkan是跨平台的，他不能和窗口系统交互，而Window Surface就提供了窗口系统所需的信息，使 Vulkan 能够将渲染结果显示在正确的窗口中。可以用VK_KHR_surface扩展实现。（Khronos为了实现跨平台的目标，为不同平台创造了一个统一的抽象层，名为surface，它是将Vulkan和具体设备显示连接起来的一个桥梁）
+
+创建成功后，可以在 Vulkan 中使用 Window Surface层来创建 Swapchain（交换链）。Vulkan不存在默认的帧缓冲的概念，它需要一个能够缓冲渲染操作的组件。交换链本质上是一个包含了若干等待呈现的图像的队列。应用程序从交换链获取一张图像，在图像上进行渲染操作，完成后将图像返回到交换链队列。交换链也被用来同步图像呈现和屏幕刷新。
 
 
 
