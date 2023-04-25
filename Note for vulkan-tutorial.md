@@ -79,7 +79,7 @@ ps：
 
 ![image](https://user-images.githubusercontent.com/56297955/234134473-4a59cde0-31fc-4d5a-b6ed-6d466f0f16d2.png)
 
-创建设备特性：
+创建VkDeviceCreateInfo结构体中的VkDeviceFeatures：
 
 ![image](https://user-images.githubusercontent.com/56297955/234134649-11b1b94a-dc1e-46fb-ad42-1ade84dae404.png)
 
