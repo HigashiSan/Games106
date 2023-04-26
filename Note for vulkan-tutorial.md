@@ -178,6 +178,15 @@ ps：
 
 在Vulkan中，图像视图（Image View）是用于访问图像（Image）数据的对象，它描述了图像的格式、范围、用途等属性。通过创建图像视图，我们可以将图像数据绑定到渲染管线的特定阶段，如顶点着色器、片段着色器、几何着色器等，以便进行渲染操作。简单来说Image就是一个rendertarget对象，管线绑定上之后就可以访问它。
 
+VkImage就是一个视图对象，需要使用VkImageView绑定之后去访问它，所以首先定义一个vector，去存交换链中的视图：
+
+![image](https://user-images.githubusercontent.com/56297955/234705798-c800c0d2-f5fc-4459-ba52-50c390f3655c.png)
+
+然后遍历交换链中的所有图像，依次填写VkImageViewCreateInfo结构体，给他们创建图像视图：
+
+![image](https://user-images.githubusercontent.com/56297955/234707954-7156700e-ae5a-4bf1-a4aa-f77bce28ee8b.png)
+
+![image](https://user-images.githubusercontent.com/56297955/234712134-96ca0981-6771-45b6-8d59-5bee1b369e05.png)
 
 
 
