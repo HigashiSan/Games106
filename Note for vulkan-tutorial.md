@@ -200,6 +200,8 @@ VkImage就是一个视图对象，需要使用VkImageView绑定之后去访问�
 
 ### Graphics pipeline basics
 
+#### ShaderModule
+
 大部分都和常规的图形管线一样，但Vulkan不是很支持管线的动态设置，都是在管线创建前提前设置好的
 
 ![image](https://user-images.githubusercontent.com/56297955/234718193-d7bb875d-a3f0-4a19-9de9-e0467fee21bc.png)
@@ -236,11 +238,23 @@ VkImage就是一个视图对象，需要使用VkImageView绑定之后去访问�
 
 ![image](https://user-images.githubusercontent.com/56297955/235330331-561921da-41ca-4f70-8d05-c6b876872734.png)
 
-在配置完shader之后，就还剩管线的固定部分，现在用一个模块去总结一下pipeline的固定部分，Fixed functions：
+在配置完shader之后，就还剩管线的固定部分，现在用一个模块去总结一下pipeline的其它部分，Fixed functions、render passes
 
 #### Fixed functions
 
-在 Vulkan 渲染管线中，固定功能是指渲染管线中不需要自定义着色器的部分，这些功能由硬件实现，并由 Vulkan API 提供标准化的接口。相当于配置一下这些接口，就可以让硬件按照指定的方式渲染。
+在 Vulkan 渲染管线中，固定功能是指渲染管线中不需要自定义着色器的部分，这些功能由硬件实现，并由 Vulkan API 提供标准化的接口。相当于配置一下这些接口，就可以让硬件按照指定的方式渲染。比如：使用VkPipelineVertexInputStateCreateInfo去描述传递给顶点着色器的顶点数据格式；使用VkPipelineInputAssemblyStateCreateInfo描述点数据定义了哪种类型的几何图元，以及是否启用几何图元重启，使用VkViewport 定义视口；使用VkPipelineRasterizationStateCreateInfo结构体对光栅化过程进行配置；使用VkPipelineMultisampleStateCreateInfo进行MSAA的配置；使用VkPipelineDepthStencilStateCreateInfo配置深度测试和模板测试；对于颜色混合，也就是blend，有两种个结构体可以用来配置，VkPipelineColorBlendAttachmentState和VkPipelineColorBlendStateCreateInfo；对于Vulkan的管线，有极少的部分可以动态改变，可以使用VkPipelineDynamicStateCreateInfo进行配置；对于着色器的一些全局的uniform对象，需要在创建管线时使用VkPipelineLayout去指定
+
+#### Render Passes
+
+Render pass是Vulkan中描述渲染操作的机制，可以理解为一种渲染操作的容器。它定义了一组附着点（attachment），并指定了一系列渲染操作，以及这些操作对附着点的影响。
+
+在Render pass中，每个附着点都代表了一个图像视图（image view）以及一组加载和存储操作。通过定义附着点，开发人员可以告诉Vulkan如何使用图像资源，并指定在渲染操作中对图像资源进行的操作，例如清空、加载和存储等。
+
+除了附着点，Render pass还包含了一个或多个子通道（subpass），每个子通道代表了一组渲染操作。在每个子通道中，开发人员可以指定需要渲染的图形管线、使用的附着点以及渲染操作的顺序。子通道之间可以定义依赖关系，以确保渲染操作的正确顺序。
+
+通过将渲染操作组织为Render pass，Vulkan可以在编译时对渲染操作进行优化，以提高渲染效率。例如，Vulkan可以在渲染到附着点之前执行一些预处理操作，以减少需要写入附着点的数据量。此外，Render pass还可以利用Vulkan的多重采样和深度测试等特性，以实现高效的渲染操作。
+
+##### 总结一下：
 
 
 
