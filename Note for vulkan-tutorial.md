@@ -254,7 +254,9 @@ Render pass是Vulkan中描述渲染操作的机制，可以理解为一种渲染
 
 通过将渲染操作组织为Render pass，Vulkan可以在编译时对渲染操作进行优化，以提高渲染效率。例如，Vulkan可以在渲染到附着点之前执行一些预处理操作，以减少需要写入附着点的数据量。此外，Render pass还可以利用Vulkan的多重采样和深度测试等特性，以实现高效的渲染操作。
 
-##### 总结一下：
+**总结一下：render pass就是Vulkan用来定义渲染操作的，他就是一系列对帧缓冲的操作，然后操作完成之后如何处理结果，是保存，还是舍弃。**
+
+**在定义renderpass时，可以定义多个attachment，每个attachment都是一个帧缓冲和一组加载和存储操作以及最终的布局方式，然后定义子流程（也就是一系列渲染流程），子流程会指定它依赖的attachment，一些系列的渲染构成一个renderpass，子流程类似于unity的renderfeature**
 
 
 
