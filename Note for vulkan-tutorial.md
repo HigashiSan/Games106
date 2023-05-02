@@ -256,14 +256,79 @@ Render pass是Vulkan中描述渲染操作的机制，可以理解为一种渲染
 
 **总结一下：render pass就是Vulkan用来定义渲染操作的，他就是一系列对帧缓冲的操作，然后操作完成之后如何处理结果，是保存，还是舍弃。**
 
-**在定义renderpass时，可以定义多个attachment，每个attachment都是一个帧缓冲和一组加载和存储操作以及最终的布局方式，然后定义子流程（也就是一系列渲染流程），子流程会指定它依赖的attachment，一些系列的渲染构成一个renderpass，子流程类似于unity的renderfeature**
+**在定义renderpass时，可以定义多个attachment，每个attachment都是一个帧缓冲和一组加载和存储操作以及最终的布局方式，然后定义子流程（也就是一系列渲染流程），子流程会指定它依赖的attachment，一些系列的渲染构成一个renderpass，renderpass类似于unity的renderfeature，子流程就类似于每一个提交到contex的cmd，一个feature可以有多个cmd操作**
 
+定义好了前面的shadermodule、管线fixed部分和renderpass之后，就可以具体创建图形管线对象，使用VkGraphicsPipelineCreateInfo这个API，又到了填api的时候：
 
+![image](https://user-images.githubusercontent.com/56297955/235565894-b5d5c0c0-3283-4f44-852c-f444499174a5.png)
 
+sType是Vulkan中用来描述结构体类型的，比如告诉vulkan这个结构体是一个VkGraphicsPipelineCreateInfo结构体，stageCount是我们要使用的可编程着色器个数，使用pStages去接收这些着色器，它是使用VkPipelineShaderStageCreateInfo去描述的。剩下的部分如pVertexInputState这些，就是引用之前填好的结构体。
 
+这个结构体填好之后，就可以创建我们的管线对象了：
 
+![image](https://user-images.githubusercontent.com/56297955/235579495-fcd7c068-98f5-4490-a112-a0752ac0994c.png)
 
+![image](https://user-images.githubusercontent.com/56297955/235578949-5d5db67f-ff95-47b0-8b0a-7535044d2248.png)
 
+管线对象创建好之后，就是为renderpass绑定帧缓冲，帧缓冲的个数就是之前硬件支持的交换链的个数，同样是配置帧缓冲结构体，然后create：
+
+![image](https://user-images.githubusercontent.com/56297955/235597572-ddfae973-56a1-4c7b-be3c-437fa8c9a656.png)
+
+这些所有准备工作设置好之后，就是真正的绘制指令，command buffer，vulkan的命令也是提交到pool里，然后统一对一个pool里的命令进行操作，这些东西和unity里面的pool，cmd大同小异。在管线配置好之后，使用VkCommandPool创建一个命令池对象，填写完命令池的结构体之后使用vkCreateCommandPool创建命令池：
+
+![image](https://user-images.githubusercontent.com/56297955/235600639-4ceffaed-a07d-44f1-9ac8-d799d1756ec9.png)
+
+然后就是创建cmd，
+
+![image](https://user-images.githubusercontent.com/56297955/235603907-6075784a-04f9-4db7-ae39-94ecae7f9047.png)
+
+![image](https://user-images.githubusercontent.com/56297955/235604075-1d8d03f1-9ba3-4a66-9ca2-9c66862e7205.png)
+
+创建完cmd之后就是使用vkBeginCommandBuffer记录这些命令：
+
+![image](https://user-images.githubusercontent.com/56297955/235604742-e39d3598-9446-486f-96da-83eb0541f7df.png)
+
+然后就是正式开始渲染流程，使用VkRenderPassBeginInfo结构体来指定开始执行渲染流程所需的信息：
+
+![image](https://user-images.githubusercontent.com/56297955/235606323-0b71c46e-ef8b-4ded-adfc-d9dc8dda74e4.png)
+
+然后把这个信息绑定到当前的渲染管线：
+
+![image](https://user-images.githubusercontent.com/56297955/235606416-8aca3f55-5116-4924-b530-28e18f93c6f9.png)
+
+然后就可以调用vkCmdDraw进行绘制：
+
+![image](https://user-images.githubusercontent.com/56297955/235610912-ad2af066-5e25-4781-8060-7e2128ac6d94.png)
+
+最后再结束渲染流程，并记录cmd：
+
+![image](https://user-images.githubusercontent.com/56297955/235611584-5c8f00cc-b205-49fb-b5ea-cd315ec60fd8.png)
+
+具体的渲染指令，就在vkCmdBeginRenderPass和vkCmdEndRenderPass之间。和unity的逻辑一样，在后面会把里面的绘制指令提交，然后自动执行。
+
+### 渲染呈现
+
+在主循环中取得交换链的图像，执行缓冲区的cmd，返回结果图像到交换链，然后呈现。
+
+为了控制先渲染，再呈现结果，如果有结果了，就不渲染，使用VkSemaphore去设置信号，创建两个信号，一个信号量发出图像已经被获取，可以开始渲染的信号；一个信号量发出渲染已经结果，可以开始呈现的信号。从交换链获取图像使用vkAcquireNextImageKHR去实现，创建信号在准备阶段进行，在mainloop的draw之前：
+
+![image](https://user-images.githubusercontent.com/56297955/235735207-fc4f2135-70c9-4de5-957c-ddf966da2496.png)
+
+截至到目前为止，无论是管线创建、信号量创建、cmd创建、cmd绑定到pipeline。。。都是准备工作，下面就是真正提交cmd，提交cmd之后，才能执行
+
+要提交cmd，会使用到VkSubmitInfo结构体。VkSubmitInfo结构体用于指定提交一组Command Buffer时的信息，主要用于指定需要提交的Command Buffer、信号量和等待信号量、等待的管线阶段以及提交的信号量和等待信号量的信号值等信息，以实现Command Buffer之间的同步和确保执行顺序的正确性，所以首先描述VkSubmitInfo：
+
+![image](https://user-images.githubusercontent.com/56297955/235740071-59acc14b-8093-4ee9-ad03-abb0b81a908d.png)
+
+然后使用vkQueueSubmit提交需要提交的cmd：
+
+![image](https://user-images.githubusercontent.com/56297955/235743544-71e9217d-74d7-4b1e-9a73-b162220420fb.png)
+
+vulkan在执行完提交的cmd之后，就需要返回帧缓冲，把图像返回给交换链，呈现到屏幕上，通过VkPresentInfoKHR配置呈现信息，然后通过vkQueuePresentKHR呈现图像
+
+![image](https://user-images.githubusercontent.com/56297955/235789057-40d1f834-673b-4547-ad63-7bc7921ed833.png)
+
+这样就可以画出三角形了，vulkan的基础确实很多，但一两天看完没啥问题，比起opengl确实麻烦了不少，但同时也感觉到了可自己控制的部分也在增多。
 
 
 
