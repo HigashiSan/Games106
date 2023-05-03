@@ -330,18 +330,59 @@ vulkan在执行完提交的cmd之后，就需要返回帧缓冲，把图像返�
 
 这样就可以画出三角形了，vulkan的基础确实很多，但一两天看完没啥问题，比起opengl确实麻烦了不少，但同时也感觉到了可自己控制的部分也在增多。
 
+### 顶点缓冲 Vertex Buffer
 
+这是我学得很痛苦的一个东西，看了很久，才把所有的疑问解决，然后理解，这里记录一下。
 
+之前的顶点信息是硬编码在顶点着色器里的：
 
+![image](https://user-images.githubusercontent.com/56297955/235811132-d4a804c5-3384-46b3-9581-de6b52abeb65.png)
 
+现在以顶点缓冲的形式往shader里面送数据：
 
+![image](https://user-images.githubusercontent.com/56297955/235811242-dea4c387-5955-406c-8289-45f831e29a85.png)
 
+在对顶点的描述上，需要掌握两个API：VkVertexInputBindingDescription，描述顶点的存放，包括stride，binding索引等，以及VkVertexInputAttributeDescription描述顶点属性，包括顶点数据存放的location、数据类型format等。
 
+分别用两个函数实现：
 
+![image](https://user-images.githubusercontent.com/56297955/235825082-7a186f92-de5a-4c70-9e8f-91b6fff5fda0.png)
 
+然后就是把数据给管线，通过填写VkPipelineVertexInputStateCreateInfo结构体，这个结构体是在创建pipeline的时候创建的：
 
+![image](https://user-images.githubusercontent.com/56297955/235827302-668c83d6-635c-4d4a-ab9d-8095f6724d81.png)
 
+把顶点数据送到管线之后，就创建顶点缓冲，高效地把顶点数据存储在GPU的特定区域，首先同样地填写VkBufferCreateInfo结构体，然后创建：
 
+![image](https://user-images.githubusercontent.com/56297955/235833684-530cf4f1-7d98-46a8-806b-1c29dbf0d1c3.png)
+
+创建好之后为它分配空间，后面我们就可以把顶点数据放在这里，分配空间首先使用VkMemoryRequirements结构体，用vkGetBufferMemoryRequirements查询我们缓冲区对象所需的内存大小和内存类型：
+
+![image](https://user-images.githubusercontent.com/56297955/235854620-fd276b10-54cb-4405-aad4-4de16628d01d.png)
+
+![image](https://user-images.githubusercontent.com/56297955/235856369-8bd03dd1-b2af-4631-8e0b-5c425d83ef92.png)
+
+然后使用vkGetPhysicalDeviceMemoryProperties函数查询物理设备可用的内存类型：
+
+![image](https://user-images.githubusercontent.com/56297955/235858511-6eac0ab6-9f75-4052-86c8-041ddd4ef5cb.png)
+
+这些都准备好之后，就是填写VkMemoryAllocateInfo结构体，然后就可以用它指定内存地分配：
+
+![image](https://user-images.githubusercontent.com/56297955/235859217-48cc8ee7-a85d-4199-b25a-7e87138f4bc5.png)
+
+分配好之后，就可以使用vkBindBufferMemory把这片内存与之前地顶点数据关联：
+
+![image](https://user-images.githubusercontent.com/56297955/235859703-3ecad532-0859-440c-8819-1dbe3c542a01.png)
+
+最后就可以使用vkMapMemory将缓冲对应的那一部分GPU内存映射到CPU的顶点数据所在的那一部分内存，然后用memcpy将数据实际地复制过去：
+
+![image](https://user-images.githubusercontent.com/56297955/235862025-d4eace43-be20-4d1b-9203-8c71c7ec11d5.png)
+
+然后就绑定好缓冲：
+
+![image](https://user-images.githubusercontent.com/56297955/235864949-951bb769-2931-45ce-b50a-1a927c1faaf0.png)
+
+这里的第二个参数就是layout的缓冲区位置，location = 0
 
 
 
