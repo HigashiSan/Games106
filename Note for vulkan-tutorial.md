@@ -382,9 +382,37 @@ vulkan在执行完提交的cmd之后，就需要返回帧缓冲，把图像返�
 
 ![image](https://user-images.githubusercontent.com/56297955/235864949-951bb769-2931-45ce-b50a-1a927c1faaf0.png)
 
-这里的第二个参数就是layout的缓冲区位置，location = 0
+这里的第二个参数就是layout的缓冲区位置，location = 0，如果把第二个参数改成不与location匹配的，就拿不到对应的顶点数据。
 
+**总结一下流程，确定好shader里的layout，明确要取的顶点数据从哪个location拿，然后定义VkBuffer vertexBuffer，创建buffer，在GPU上为它分配内存空间，然后把buffer绑定在这片内存，然后把数据copy到这篇内存。**
 
+### 暂存缓冲 Staging buffer
+
+### 引索缓冲 Index buffer
+
+和opengl几乎一样，创建它的流程也和vertexbuffer差不多
+
+### Uniform buffer
+
+重点。uniform变量，主要是为了可以在程序运行时被修改，也就是Uniform Buffer Object（UBO对象），它主要用于存储Uniform数据的缓冲区对象。UBO对象可以包含多个Uniform变量，这些变量在渲染管线中的Shader Stage中使用。UBO对象的数据可以在应用程序运行时进行修改，并且可以被多个Draw调用共享。
+
+它本质上也是一个buffer，所以创建过程和vertexbuffer差不多：
+
+1、创建Uniform Buffer的数据结构：在应用程序中定义Uniform数据结构，即一个struct。
+
+2、创建Uniform Buffer的VkBuffer对象：使用VkBufferCreateInfo结构体创建一个Uniform Buffer的VkBuffer对象。
+
+3、分配Uniform Buffer的内存：使用VkMemoryRequirements和VkDeviceMemory对象来分配Uniform Buffer的内存。
+
+4、将Uniform Buffer的数据映射到CPU内存：使用vkMapMemory函数将Uniform Buffer的数据映射到CPU内存中，以便CPU可以对Uniform数据进行修改。
+
+5、将Uniform数据复制到Uniform Buffer中：在CPU内存中修改Uniform数据，并使用vkMemcpy函数将数据从CPU内存复制到Uniform Buffer中。
+
+6、将Uniform Buffer绑定到渲染管线中的Shader Stage上：使用vkCmdBindDescriptorSets函数将Uniform Buffer对象绑定到渲染管线中的Shader Stage上。
+
+于是一个UBO对象（我们需要的数据集合）就创建好了，注意shader中的layout与struct定义的数据要一致，这样就可以在shader里面通过layout去访问变量或者资源。
+
+layout就是描述符，set就是符级，一个set可以有多个描述符。
 
 
 
